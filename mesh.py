@@ -60,7 +60,7 @@ def duplicateClean(src_mesh, name=None):
     return new_mesh
 
 
-def transferShapes(src_bsnode, tgt_node, tgt_prefix='_'):
+def _transferShapes(src_bsnode, tgt_node, tgt_prefix='_'):
     """
     Generates new blendshape meshes
 
@@ -119,6 +119,23 @@ def transferShapes(src_bsnode, tgt_node, tgt_prefix='_'):
         new_shapes.append(tgt_shape)
 
     return new_shapes
+
+
+def transferBlendShapes(prefix='_'):
+    sel = pm.ls(sl=True)
+    if sel:
+        srcnode = sel[0]
+
+        if srcnode.listHistory(type='blendShape'):
+            bsnode = srcnode.listHistory(type='blendShape')[0]
+        else:
+            pm.warning(
+                'Node {} has no blendShape input.'.format(srcnode.name()))
+            return
+
+        tgtnode = srcnode if len(sel) < 2 else sel[1]
+
+        return _transferShapes(bsnode, tgtnode, prefix)
 
 
 def createWtDriver(joint, target, rotation=(0, 0, 0), angle=None):
